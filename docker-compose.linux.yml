@@ -1,0 +1,68 @@
+version: '3.8'
+
+# Linux-optimized configuration with host networking for better device discovery
+# Usage: docker compose -f docker-compose.linux.yml up -d
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    volumes:
+      - ./config:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=${TZ:-America/New_York}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: MQTT Broker (Mosquitto)
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto:/mosquitto/config
+      - ./data/mosquitto:/mosquitto/data
+      - ./data/mosquitto/log:/mosquitto/log
+    environment:
+      - TZ=${TZ:-America/New_York}
+    profiles:
+      - mqtt
+
+  # Optional: Node-RED for automation
+  nodered:
+    container_name: nodered
+    image: nodered/node-red:latest
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./data/nodered:/data
+    environment:
+      - TZ=${TZ:-America/New_York}
+    profiles:
+      - automation
+
+  # Optional: ESPHome for ESP device management
+  esphome:
+    container_name: esphome
+    image: esphome/esphome:latest
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./config/esphome:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=${TZ:-America/New_York}
+    profiles:
+      - esphome
