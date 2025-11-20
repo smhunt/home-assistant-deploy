@@ -70,5 +70,39 @@ Configuration is managed via `.env` file (created from `.env.example`):
 - `docker-compose.yml` - macOS-compatible configuration (bridge networking)
 - `docker-compose.linux.yml` - Linux-optimized configuration (host networking)
 - `.env.example` - Environment variable template
-- `config/` - Home Assistant configuration directory
-- `data/` - Persistent data for optional services
+- `config/` - Home Assistant configuration directory (excluded from git)
+- `data/` - Persistent data for optional services (excluded from git)
+- `.env` - User's environment configuration (excluded from git)
+
+## Version Control
+
+**Excluded from git (via .gitignore):**
+- `config/` - Contains user-specific Home Assistant configuration, secrets, and databases
+- `data/` - Contains runtime data for optional services
+- `.env` - Contains environment variables
+
+These directories are created at runtime when Home Assistant first starts. The `.env` file is created by copying `.env.example`.
+
+## Initial Setup
+
+1. Copy `.env.example` to `.env` and configure
+2. Run `docker compose up -d`
+3. Access `http://localhost:8123` for initial Home Assistant setup wizard
+4. Configuration files will be automatically created in `./config/`
+
+## Configuration Management
+
+**Check configuration before restarting:**
+```bash
+docker compose exec homeassistant ha core check
+```
+
+**Restart after configuration changes:**
+```bash
+docker compose restart homeassistant
+```
+
+**Access Home Assistant CLI:**
+```bash
+docker compose exec homeassistant bash
+```

@@ -37,11 +37,15 @@ docker compose up -d
 
 ```
 .
-├── config/            # Home Assistant configuration files
-├── data/             # Persistent data for optional services
-├── docker-compose.yml
-└── .env              # Environment configuration (create from .env.example)
+├── config/                    # Home Assistant configuration files (not in git)
+├── data/                      # Persistent data for optional services (not in git)
+├── docker-compose.yml         # macOS-compatible configuration
+├── docker-compose.linux.yml   # Linux-optimized configuration
+├── .env.example              # Environment variable template
+└── .env                      # Your environment config (create from .env.example, not in git)
 ```
+
+**Note:** The `config/` and `data/` directories are excluded from version control via `.gitignore` since they contain user-specific configuration, secrets, and runtime data.
 
 ## Platform-Specific Notes
 
@@ -151,14 +155,73 @@ docker compose -f docker-compose.linux.yml logs -f homeassistant
 
 ## Configuration
 
-Home Assistant configuration files are stored in `./config/`. Edit `configuration.yaml` and other files in this directory to customize your setup.
+### Initial Setup
 
-## Backup
+When you first access Home Assistant at `http://localhost:8123`, you'll be guided through an initial setup wizard where you'll:
+1. Create an admin account
+2. Set your location and unit system
+3. Configure basic settings
 
-To backup your Home Assistant configuration:
+After setup, the `./config/` directory will contain all your Home Assistant configuration files.
+
+### Managing Configuration
+
+**Main configuration file:** `./config/configuration.yaml`
+
+Edit configuration files in the `./config/` directory to customize your setup. After making changes:
+
 ```bash
+# Restart Home Assistant to apply changes
+docker compose restart homeassistant
+
+# Or check configuration before restarting
+docker compose exec homeassistant ha core check
+```
+
+**Important files:**
+- `configuration.yaml` - Main configuration
+- `automations.yaml` - Automation definitions
+- `scripts.yaml` - Script definitions
+- `secrets.yaml` - Sensitive data (passwords, API keys)
+- `.storage/` - Internal Home Assistant storage (don't edit directly)
+
+## Backup & Version Control
+
+### Backing Up Your Configuration
+
+**Full backup (recommended):**
+```bash
+# Create a backup of all config and data
 tar -czf ha-backup-$(date +%Y%m%d).tar.gz config/ data/
 ```
+
+**Configuration-only backup:**
+```bash
+# Backup just the config directory
+tar -czf ha-config-$(date +%Y%m%d).tar.gz config/
+```
+
+### Version Control Considerations
+
+This repository is configured with `.gitignore` to exclude:
+- `config/` - Contains user-specific settings and secrets
+- `data/` - Contains runtime data for optional services
+- `.env` - Contains your environment variables
+
+**If you want to version control your Home Assistant configuration:**
+
+1. Create a separate git repository in the `config/` directory
+2. Create a custom `.gitignore` inside `config/` to exclude sensitive files:
+   ```bash
+   cd config/
+   git init
+   echo "secrets.yaml" >> .gitignore
+   echo ".storage/" >> .gitignore
+   echo "*.log" >> .gitignore
+   echo "*.db*" >> .gitignore
+   git add .
+   git commit -m "Initial Home Assistant configuration"
+   ```
 
 ## Troubleshooting
 
