@@ -5,7 +5,11 @@ secrets.yaml
 .env
 .env.local
 
-# Home Assistant
+# Home Assistant runtime directories (user-generated data)
+config/
+data/
+
+# Home Assistant files
 home-assistant.log
 home-assistant_v2.db
 *.db-shm
