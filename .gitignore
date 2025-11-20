@@ -1,0 +1,46 @@
+# Secrets and credentials
+*.key
+*.pem
+secrets.yaml
+.env
+.env.local
+
+# Home Assistant
+home-assistant.log
+home-assistant_v2.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Ansible
+*.retry
+
+# Docker
+docker-compose.override.yml
